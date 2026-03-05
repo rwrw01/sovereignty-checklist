@@ -1,22 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* MXI Brand Colors */
+  --mxi-purple: #883486;
+  --mxi-blue: #4ea7f9;
+  --mxi-dark: #0f0f11;
+  --mxi-dark-secondary: #1e1e1e;
+  --mxi-light: #f0f0f0;
+  --mxi-light-secondary: #fafafa;
+  --mxi-text-dark: #444444;
+  --mxi-text-light: #ffffff;
+
+  /* Semantic */
+  --background: var(--mxi-light-secondary);
+  --foreground: var(--mxi-text-dark);
+  --primary: var(--mxi-purple);
+  --accent: var(--mxi-blue);
+
+  /* SEAL Level Colors */
+  --seal-0: #dc2626;
+  --seal-1: #ea580c;
+  --seal-2: #d97706;
+  --seal-3: #65a30d;
+  --seal-4: #16a34a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-mxi-purple: var(--mxi-purple);
+  --color-mxi-blue: var(--mxi-blue);
+  --color-mxi-dark: var(--mxi-dark);
+  --color-mxi-dark-secondary: var(--mxi-dark-secondary);
+  --color-seal-0: var(--seal-0);
+  --color-seal-1: var(--seal-1);
+  --color-seal-2: var(--seal-2);
+  --color-seal-3: var(--seal-3);
+  --color-seal-4: var(--seal-4);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+e2e
+test-results
+tests
+playwright.config.ts
+playwright-report
+data/*.db
+.env.local
