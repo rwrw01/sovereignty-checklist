@@ -97,6 +97,49 @@ export const tokenSchema = z
   .string()
   .uuid('Ongeldig assessment token');
 
+/** Schema for user registration */
+export const userRegistrationSchema = z.object({
+  email: z
+    .string()
+    .email('Ongeldig e-mailadres')
+    .max(254, 'E-mailadres te lang')
+    .trim()
+    .toLowerCase(),
+  name: z
+    .string()
+    .min(2, 'Naam is verplicht (minimaal 2 tekens)')
+    .max(200, 'Naam mag maximaal 200 tekens zijn')
+    .trim(),
+  password: z
+    .string()
+    .min(12, 'Wachtwoord minimaal 12 tekens')
+    .max(128, 'Wachtwoord maximaal 128 tekens'),
+});
+
+/** Schema for user login */
+export const userLoginSchema = z.object({
+  email: z
+    .string()
+    .email('Ongeldig e-mailadres')
+    .max(254, 'E-mailadres te lang')
+    .trim()
+    .toLowerCase(),
+  password: z
+    .string()
+    .min(12, 'Wachtwoord minimaal 12 tekens')
+    .max(128, 'Wachtwoord maximaal 128 tekens'),
+});
+
+/** Schema for creating assessment as logged-in user (simplified) */
+export const createUserAssessmentSchema = z.object({
+  assessmentType: z.enum(assessmentTypes, {
+    message: 'Kies een assessment type (seal of sra)',
+  }),
+});
+
 export type CreateAssessmentInput = z.infer<typeof createAssessmentSchema>;
 export type SubmitAnswersInput = z.infer<typeof submitAnswersSchema>;
 export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
+export type UserRegistrationInput = z.infer<typeof userRegistrationSchema>;
+export type UserLoginInput = z.infer<typeof userLoginSchema>;
+export type CreateUserAssessmentInput = z.infer<typeof createUserAssessmentSchema>;

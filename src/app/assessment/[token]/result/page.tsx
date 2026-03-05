@@ -289,6 +289,56 @@ export default function ResultPage() {
           </Card>
         )}
 
+        {/* Explanation: Why SEAL-3/SRA-3 is the minimum */}
+        <Card className="mb-8 border-blue-200 bg-blue-50">
+          <h2 className="text-lg font-bold mb-3 text-mxi-dark">
+            {isSra ? "Waarom SRA-3 als minimum?" : "Waarom SEAL-3 als minimum?"}
+          </h2>
+          <p className="text-sm text-gray-700 mb-3">
+            {isSra
+              ? 'SRA-3 ("Goed Voorbereid") is het niveau waarbij een organisatie structureel voorbereid is op digitale soevereiniteitsrisico\'s. Onder dit niveau mist de organisatie:'
+              : 'SEAL-3 ("Grotendeels Soeverein") is het niveau waarbij een organisatie aantoonbare controle heeft over haar digitale infrastructuur binnen EU-jurisdictie. Onder dit niveau bestaan risico\'s op:'}
+          </p>
+          <ul className="flex flex-col gap-1.5 mb-3 ml-4">
+            {isSra ? (
+              <>
+                <li className="text-sm text-gray-700 list-disc">
+                  Gestructureerd beleid voor digitale soevereiniteit en afhankelijkheden
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Inzicht in verborgen afhankelijkheden van niet-EU leveranciers
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Adequate incident preparedness voor leveranciersuitval
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Aansluiting bij regelgeving zoals NIS2, DORA en de European Data Act
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="text-sm text-gray-700 list-disc">
+                  Extraterritoriale wetgeving (CLOUD Act, FISA 702) die toegang tot data kan afdwingen
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Eenzijdige wijzigingen door niet-EU partijen in service-voorwaarden
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Beperkte portabiliteit waardoor vendor lock-in ontstaat
+                </li>
+                <li className="text-sm text-gray-700 list-disc">
+                  Onvoldoende transparantie over dataverwerking en governance
+                </li>
+              </>
+            )}
+          </ul>
+          <p className="text-sm text-gray-700">
+            {isSra
+              ? "Het SRA framework is gebaseerd op Nederlandse onderzoeken naar digitale afhankelijkheden. SRA-3 vormt de basis voor verantwoorde digitale keuzes."
+              : "Het EU SEAL Framework stelt SEAL-3 als drempel voor overheden en gereguleerde sectoren. Een bewuste keuze met mitigatie is beter dan onbewuste afhankelijkheid \u2014 maar die keuze vereist minimaal SEAL-3 inzicht."}
+          </p>
+        </Card>
+
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center pb-12">
           <a

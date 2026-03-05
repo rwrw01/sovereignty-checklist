@@ -32,6 +32,10 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/api/v1/admin/auth': { windowMs: 60_000, maxRequests: 10 },
   // Admin seed: max 5 attempts per minute
   '/api/v1/admin/seed': { windowMs: 60_000, maxRequests: 5 },
+  // User login: max 10 attempts per minute (brute-force protection)
+  '/api/v1/auth/login': { windowMs: 60_000, maxRequests: 10 },
+  // User registration: max 5 attempts per minute
+  '/api/v1/auth/register': { windowMs: 60_000, maxRequests: 5 },
 };
 
 function getClientIp(request: NextRequest): string {

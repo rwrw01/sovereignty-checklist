@@ -9,6 +9,7 @@ import { SOV_CATEGORIES, SOV_WEIGHTS } from "@/lib/seal/weights";
 import { getSraQuestionsByTheme, SRA_TOTAL_QUESTIONS } from "@/lib/sra/questions";
 import { SRA_THEMES, SRA_WEIGHTS } from "@/lib/sra/weights";
 import type { AssessmentType } from "@/lib/validation";
+import { useUserSession } from "@/lib/hooks/useUserSession";
 
 interface SavedAnswer {
   questionId: string;
@@ -95,7 +96,9 @@ export default function QuestionnairePage() {
   const [submitting, setSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState<string>("");
   const [expandedContext, setExpandedContext] = useState<string | null>(null);
+  const [saveConfirm, setSaveConfirm] = useState("");
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { user: loggedInUser } = useUserSession();
 
   // Fetch assessment data
   useEffect(() => {
@@ -179,6 +182,43 @@ export default function QuestionnairePage() {
     // Debounced auto-save (1.5s after last change)
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => autoSave(updated), 1500);
+  }
+
+  // Explicit save (no debounce)
+  async function handleExplicitSave() {
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    setSaving(true);
+    setSaveConfirm("");
+    try {
+      const payload = Object.entries(answers).map(([questionId, score]) => ({
+        questionId,
+        score,
+      }));
+      if (payload.length === 0) return;
+      await fetch(`/api/v1/assessments/${token}/answers`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: payload }),
+      });
+      const now = new Date().toLocaleTimeString("nl-NL");
+      setLastSaved(now);
+      setSaveConfirm(`Opgeslagen om ${now}`);
+      setTimeout(() => setSaveConfirm(""), 3000);
+    } catch {
+      // Silent
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Save & go to dashboard (or show bookmark hint)
+  async function handleSaveAndLeave() {
+    await handleExplicitSave();
+    if (loggedInUser) {
+      router.push("/dashboard");
+    } else {
+      setSaveConfirm("Voortgang opgeslagen! Bookmark deze pagina om later verder te gaan.");
+    }
   }
 
   // Submit final assessment
@@ -371,8 +411,39 @@ export default function QuestionnairePage() {
           ))}
         </div>
 
+        {/* Save confirmation toast */}
+        {saveConfirm && (
+          <div className={`rounded-lg p-3 text-sm mb-4 ${
+            saveConfirm.includes("Bookmark")
+              ? "bg-blue-50 text-blue-800"
+              : "bg-green-50 text-green-800"
+          }`}>
+            {saveConfirm}
+          </div>
+        )}
+
+        {/* Save buttons */}
+        <div className="flex flex-wrap gap-2 pb-4 pt-4 border-t border-gray-200">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExplicitSave}
+            disabled={saving || Object.keys(answers).length === 0}
+          >
+            {saving ? "Opslaan..." : "Opslaan"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleSaveAndLeave}
+            disabled={saving}
+          >
+            {loggedInUser ? "Opslaan & Naar Dashboard" : "Opslaan & Later verder"}
+          </Button>
+        </div>
+
         {/* Navigation buttons */}
-        <div className="flex justify-between items-center pb-12 pt-4 border-t border-gray-200">
+        <div className="flex justify-between items-center pb-12 pt-2">
           <Button
             variant="outline"
             onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}

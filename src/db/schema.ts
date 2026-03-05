@@ -12,6 +12,7 @@ export const assessments = sqliteTable('assessments', {
   contactEmail: text('contact_email').notNull(),
   contactPhone: text('contact_phone'),
   sector: text('sector'),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   overallScore: real('overall_score'),
   sealLevel: integer('seal_level'),
   status: text('status', { enum: ['draft', 'in_progress', 'completed'] })
@@ -27,6 +28,7 @@ export const assessments = sqliteTable('assessments', {
 }, (table) => [
   index('idx_assessments_status').on(table.status),
   index('idx_assessments_type').on(table.assessmentType),
+  index('idx_assessments_user_id').on(table.userId),
 ]);
 
 export const answers = sqliteTable('answers', {
@@ -68,6 +70,22 @@ export const sraScores = sqliteTable('sra_scores', {
 }, (table) => [
   uniqueIndex('idx_sra_scores_unique').on(table.assessmentId, table.theme),
 ]);
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  name: text('name').notNull(),
+  passwordHash: text('password_hash').notNull(),
+  companyName: text('company_name'),
+  contactPhone: text('contact_phone'),
+  sector: text('sector'),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at')
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
 
 export const adminUsers = sqliteTable('admin_users', {
   id: integer('id').primaryKey({ autoIncrement: true }),

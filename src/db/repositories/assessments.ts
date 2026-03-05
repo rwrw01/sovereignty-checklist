@@ -13,6 +13,7 @@ export interface AssessmentRow {
   contactEmail: string;
   contactPhone: string | null;
   sector: string | null;
+  userId: number | null;
   overallScore: number | null;
   sealLevel: number | null;
   status: 'draft' | 'in_progress' | 'completed';
@@ -38,6 +39,45 @@ export async function createAssessment(
   });
 
   return { token };
+}
+
+/** Create an assessment linked to a user (from dashboard) */
+export async function createUserAssessment(
+  assessmentType: AssessmentType,
+  userId: number,
+  contactInfo: {
+    companyName: string;
+    contactName: string;
+    contactEmail: string;
+    contactPhone?: string;
+    sector?: string;
+  },
+): Promise<{ token: string }> {
+  const token = uuidv4();
+
+  await db.insert(assessments).values({
+    token,
+    assessmentType,
+    userId,
+    companyName: contactInfo.companyName,
+    contactName: contactInfo.contactName,
+    contactEmail: contactInfo.contactEmail,
+    contactPhone: contactInfo.contactPhone || null,
+    sector: contactInfo.sector || null,
+  });
+
+  return { token };
+}
+
+/** List assessments for a specific user (user dashboard) */
+export async function listUserAssessments(userId: number): Promise<AssessmentRow[]> {
+  const rows = await db
+    .select()
+    .from(assessments)
+    .where(eq(assessments.userId, userId))
+    .orderBy(desc(assessments.updatedAt));
+
+  return rows as AssessmentRow[];
 }
 
 /** List all assessments (for admin dashboard) */
