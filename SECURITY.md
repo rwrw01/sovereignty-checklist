@@ -16,6 +16,28 @@ All production dependencies are:
 - Pinned to exact versions (no `^` or `~`)
 - Free of known critical/high CVEs
 
+## Known Risks & Mitigations
+
+### Assessment Token-Based Access (IDOR — CWE-639)
+
+Assessment endpoints (`/api/v1/assessments/[token]/*`) use UUIDv4 tokens as the sole
+access control. This is a **deliberate design choice** — the app allows anonymous
+assessments without requiring an account ("Geen account nodig").
+
+**Risk:** If a token leaks (browser history, email forwarding, server logs), anyone with
+the token can view/modify the assessment data (company name, contact info, scores).
+
+**Mitigating controls:**
+- UUIDv4 provides ~122 bits of entropy — brute-force is computationally infeasible
+- Completed assessments reject further modifications (409 Conflict)
+- Rate limiting on answer submission prevents automated abuse
+- Assessment creation is rate-limited to prevent enumeration
+- Tokens are never exposed in server logs (only validated via Zod)
+
+**Residual risk:** Accepted. Users who share their assessment URL share access. This is
+analogous to Google Forms "anyone with the link" sharing. For environments requiring
+stricter access control, use the authenticated user flow (dashboard → assessment).
+
 ## OWASP Top 10 Mitigations
 
 | OWASP Risk | Mitigation |
@@ -24,7 +46,7 @@ All production dependencies are:
 | A02:2021 Cryptographic Failures | bcrypt for password hashing. HTTPS via Traefik TLS. No sensitive data in URLs. |
 | A03:2021 Injection | Drizzle ORM (parameterized queries). Zod input validation on all API endpoints. React output encoding (XSS). |
 | A04:2021 Insecure Design | SEAL engine is pure functional (no side effects). Repository pattern for data access. |
-| A05:2021 Security Misconfiguration | CSP, HSTS, X-Frame-Options, X-Content-Type-Options headers. Read-only container. no-new-privileges. |
+| A05:2021 Security Misconfiguration | CSP (strict self-only policy), HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff, Permissions-Policy. Read-only container. no-new-privileges. poweredByHeader disabled. |
 | A06:2021 Vulnerable Components | Exact version pinning. `npm audit` in CI. No deprecated packages in production. |
 | A07:2021 Auth Failures | Rate limiting on login. Session expiry. HttpOnly + Secure + SameSite=Strict cookies. |
 | A08:2021 Data Integrity Failures | No deserialization of untrusted data. Zod schema validation at API boundary. |

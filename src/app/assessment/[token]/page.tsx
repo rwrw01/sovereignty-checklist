@@ -319,7 +319,10 @@ export default function QuestionnairePage() {
             return (
               <button
                 key={s.key}
-                onClick={() => setCurrentStep(idx)}
+                onClick={() => {
+                  setCurrentStep(idx);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className={`
                   flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-colors
                   ${idx === currentStep
@@ -446,7 +449,10 @@ export default function QuestionnairePage() {
         <div className="flex justify-between items-center pb-12 pt-2">
           <Button
             variant="outline"
-            onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
+            onClick={() => {
+              setCurrentStep((s) => Math.max(0, s - 1));
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             disabled={currentStep === 0}
           >
             Vorige
@@ -457,7 +463,10 @@ export default function QuestionnairePage() {
           </span>
 
           {currentStep < steps.length - 1 ? (
-            <Button onClick={() => setCurrentStep((s) => s + 1)}>
+            <Button onClick={() => {
+              setCurrentStep((s) => s + 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}>
               Volgende
             </Button>
           ) : (

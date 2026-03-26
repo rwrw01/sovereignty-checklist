@@ -267,6 +267,16 @@ export default function DashboardPage() {
               >
                 {creating === "seal" ? "Aanmaken..." : "Start SEAL"}
               </Button>
+              <a
+                href="/api/v1/questionnaires/seal/excel"
+                download
+                className="text-xs text-mxi-purple hover:underline inline-flex items-center gap-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Download Vragenlijst (Excel)
+              </a>
             </div>
           </Card>
           <Card>
@@ -285,6 +295,16 @@ export default function DashboardPage() {
               >
                 {creating === "sra" ? "Aanmaken..." : "Start SRA"}
               </Button>
+              <a
+                href="/api/v1/questionnaires/sra/excel"
+                download
+                className="text-xs text-mxi-blue hover:underline inline-flex items-center gap-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Download Vragenlijst (Excel)
+              </a>
             </div>
           </Card>
         </div>

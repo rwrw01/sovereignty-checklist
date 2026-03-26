@@ -3,10 +3,18 @@ import { hasAdmins, createAdmin } from '@/db/repositories/admin';
 
 /**
  * POST /api/v1/admin/seed — Create first admin user.
- * Only works if no admin users exist yet (one-time setup).
+ * Only works when: (1) ALLOW_ADMIN_SEED=true is set, AND (2) no admin users exist yet.
+ * After first admin is created, remove ALLOW_ADMIN_SEED from the environment.
  */
 export async function POST(request: NextRequest) {
   try {
+    if (process.env.ALLOW_ADMIN_SEED !== 'true') {
+      return NextResponse.json(
+        { error: 'Seed endpoint is uitgeschakeld. Stel ALLOW_ADMIN_SEED=true in om te activeren.' },
+        { status: 403 },
+      );
+    }
+
     const existing = await hasAdmins();
     if (existing) {
       return NextResponse.json(

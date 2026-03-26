@@ -9,6 +9,7 @@ services:
       - NODE_ENV=production
       - DATABASE_PATH=file:/app/data/sovereignty.db
       - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET}
+      - USER_SESSION_SECRET=${USER_SESSION_SECRET}
     volumes:
       - app-data:/app/data
     security_opt:

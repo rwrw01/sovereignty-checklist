@@ -27,6 +27,7 @@ interface RateLimitConfig {
   maxRequests: number;
 }
 
+/** Exact-match rate limits (path must match exactly) */
 const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // Admin login: max 10 attempts per minute (brute-force protection)
   '/api/v1/admin/auth': { windowMs: 60_000, maxRequests: 10 },
@@ -36,7 +37,21 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/api/v1/auth/login': { windowMs: 60_000, maxRequests: 10 },
   // User registration: max 5 attempts per minute
   '/api/v1/auth/register': { windowMs: 60_000, maxRequests: 5 },
+  // Public assessment creation: max 10 per minute (prevent DB flooding)
+  '/api/v1/assessments': { windowMs: 60_000, maxRequests: 10 },
+  // User assessment creation: max 10 per minute
+  '/api/v1/user/assessments': { windowMs: 60_000, maxRequests: 10 },
 };
+
+/** Pattern-based rate limits (path must match regex) */
+const PATTERN_RATE_LIMITS: { pattern: RegExp; config: RateLimitConfig; key: string }[] = [
+  // Answer submission: max 30 per minute per token (auto-save + finalize)
+  {
+    pattern: /^\/api\/v1\/assessments\/[0-9a-f-]+\/answers$/,
+    config: { windowMs: 60_000, maxRequests: 30 },
+    key: 'answers',
+  },
+];
 
 function getClientIp(request: NextRequest): string {
   // In production behind trusted proxy, use x-forwarded-for.
@@ -75,12 +90,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const config = RATE_LIMITS[pathname];
-  if (!config) return NextResponse.next();
+  // Check exact-match limits first, then pattern-based limits
+  let limitConfig = RATE_LIMITS[pathname];
+  let limitKey = pathname;
+
+  if (!limitConfig) {
+    const matched = PATTERN_RATE_LIMITS.find((p) => p.pattern.test(pathname));
+    if (!matched) return NextResponse.next();
+    limitConfig = matched.config;
+    limitKey = matched.key;
+  }
 
   const ip = getClientIp(request);
-  const key = `${ip}:${pathname}`;
-  const { allowed, remaining, resetAt } = checkRateLimit(key, config);
+  const key = `${ip}:${limitKey}`;
+  const { allowed, remaining, resetAt } = checkRateLimit(key, limitConfig);
 
   if (!allowed) {
     return NextResponse.json(
