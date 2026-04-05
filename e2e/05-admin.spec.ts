@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+const TEST_PASSWORD = process.env.TEST_PASSWORD ?? 'TestPassword123!';
+
 test.describe('Admin — seed endpoint', () => {
   test('seed returns 403 when admin already exists', async ({ request }) => {
     // Admin was already seeded in a previous session.
     // When admins exist, seed always returns 403 regardless of input.
     const res = await request.post('/api/v1/admin/seed', {
-      data: { username: 'newadmin', password: 'ValidPassword2026!!' },
+      data: { username: 'newadmin', password: TEST_PASSWORD },
     });
     expect(res.status()).toBe(403);
     const body = await res.json();
@@ -16,7 +18,7 @@ test.describe('Admin — seed endpoint', () => {
     request,
   }) => {
     const res = await request.post('/api/v1/admin/seed', {
-      data: { username: 'anotheradmin', password: 'AnotherPass2026!!' },
+      data: { username: 'anotheradmin', password: TEST_PASSWORD },
     });
     expect(res.status()).toBe(403);
   });
@@ -25,7 +27,7 @@ test.describe('Admin — seed endpoint', () => {
 test.describe('Admin — auth flow (API)', () => {
   test('login with wrong credentials returns 401', async ({ request }) => {
     const res = await request.post('/api/v1/admin/auth', {
-      data: { username: 'nonexistent', password: 'WrongPassword2026!!' },
+      data: { username: 'nonexistent', password: TEST_PASSWORD },
     });
     expect(res.status()).toBe(401);
     const body = await res.json();
@@ -34,7 +36,7 @@ test.describe('Admin — auth flow (API)', () => {
 
   test('login with too-short username returns 400', async ({ request }) => {
     const res = await request.post('/api/v1/admin/auth', {
-      data: { username: 'ab', password: 'ValidPassword2026!!' },
+      data: { username: 'ab', password: TEST_PASSWORD },
     });
     expect(res.status()).toBe(400);
   });
@@ -72,7 +74,7 @@ test.describe('Admin — login page UI', () => {
   test('shows error with wrong credentials', async ({ page }) => {
     await page.goto('/admin/login');
     await page.fill('input[name="username"]', 'wronguser');
-    await page.fill('input[name="password"]', 'WrongPassword2026!!');
+    await page.fill('input[name="password"]', TEST_PASSWORD);
     await page.click('button[type="submit"]');
     await expect(page.locator('text=Ongeldige')).toBeVisible({ timeout: 5000 });
   });

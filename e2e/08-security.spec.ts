@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const TEST_PASSWORD = process.env.TEST_PASSWORD ?? 'TestPassword123!';
+
 test.describe('Security headers', () => {
   test('response includes security headers', async ({ request }) => {
     const res = await request.get('/');
@@ -37,7 +39,7 @@ test.describe('Rate limiting', () => {
     let hitRateLimit = false;
     for (let i = 0; i < 10; i++) {
       const res = await request.post('/api/v1/admin/seed', {
-        data: { username: `ratelimit${i}xxx`, password: 'RateLimitTest2026!!' },
+        data: { username: `ratelimit${i}xxx`, password: TEST_PASSWORD },
       });
       if (res.status() === 429) {
         hitRateLimit = true;
